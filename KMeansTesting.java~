@@ -1,0 +1,8 @@
+/*
+ * File: Testing File
+ */
+
+import java.junitframework.*;
+
+public class KMeansTesting extends TestCase {
+}

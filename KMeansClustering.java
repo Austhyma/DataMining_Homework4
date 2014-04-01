@@ -7,12 +7,15 @@ import java.util.*;
 
 public class KMeansClustering {
   
-  private int k;
-  private ArrayList<Data> data;
+	private int k;
+ 	private ArrayList<Data> data;
+	private boolean euclidean;
+	private ArrayList<Cluster> clusters;
   
-  public KMeansClustering(ArrayList<Data> data, int k) {
+  public KMeansClustering(ArrayList<Data> data, int k, boolean euclidean) {
     this.k = k;
     this.data = data;
+	this.euclidean = euclidean;
   }
   
   public KMeansClustering(String filename, int k) throws IOException {
@@ -79,5 +82,14 @@ public class KMeansClustering {
   
   public static void main(String[] args) throws IOException {
     ArrayList<Data> initialData = readARFF(args[0]);
+	ArrayList<String> classLabels = new ArrayList<String>();
+	classLabels.add(initialData.get(0).getClassLabel());
+	for (int i = 1; i < initialData.size(); i++) {
+		String current = initialData.get(i).getClassLabel();
+		if (!classLabels.contains(current)) {
+			classLabels.add(current);
+		}
+	}
+	System.out.println(classLabels.toString());
   }
 }

@@ -2,10 +2,10 @@
  * File: Testing File
  */
 
-import junit.framework.*;
+//import org.junit.runner.JUnitCore;
 import java.io.*;
 
-public class KMeansTesting extends TestCase {
+public class KMeansTesting {
   
   private KMeansClustering k1, k2;
   

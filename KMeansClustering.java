@@ -24,7 +24,28 @@ public class KMeansClustering {
  public void calculateWSS() {}
  
  //TODO
- public void calculateBSS() {}
+ public void calculateBSS() {
+   Data mainCentroid;
+   double sum = 0;
+   HashMap<String, Double> dataAttributes;
+   for (int i = 0; i < clusters.size(); i++) {
+     for (Iterator<String> stuff = clusters.get(i).getCentroid().keySet().iterator(); stuff.hasNext();) {
+       String current = stuff.next();
+       if (i == 0) {
+         dataAttributes.put(current, (clusters.get(i).get(current))/clusters.size());
+       }
+       else {
+         dataAttributes.put(current, dataAttributes.get(current) + (clusters.get(i).get(current))/clusters.size());
+       }
+     }
+   }
+   
+ }
+   
+       
+       
+     
+ 
  
  //TODO
  public void calculateEntropy() {}
@@ -32,7 +53,7 @@ public class KMeansClustering {
   public KMeansClustering(ArrayList<Data> data, int k, ArrayList<String> classLabels) {
     this.k = k;
     this.data = data;
- this.classLabels = classLabels;
+    this.classLabels = classLabels;
   }
   
   public KMeansClustering(String filename, int k) throws IOException {

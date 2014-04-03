@@ -7,32 +7,32 @@ import java.util.*;
 
 public class KMeansClustering {
   
-	private int k;
- 	private ArrayList<Data> data;
-	private ArrayList<Cluster> clusters;
-	private ArrayList<String> classLabels;
-	private double WSS;
-	private double BSS;
-	private double entropy;
-	
-	//Getters
-	public double getWSS() {return this.WSS;}
-	public double getBSS() {return this.BSS;}
-	public double getEntropy() {return this.entropy;}
-	
-	//TODO
-	public void calculateWSS() {}
-	
-	//TODO
-	public void calculateBSS() {}
-	
-	//TODO
-	public void calculateEntropy() {}
+ private int k;
+ private ArrayList<Data> data;
+ private ArrayList<Cluster> clusters;
+ private ArrayList<String> classLabels;
+ private double WSS;
+ private double BSS;
+ private double entropy;
+ 
+ //Getters
+ public double getWSS() {return this.WSS;}
+ public double getBSS() {return this.BSS;}
+ public double getEntropy() {return this.entropy;}
+ 
+ //TODO
+ public void calculateWSS() {}
+ 
+ //TODO
+ public void calculateBSS() {}
+ 
+ //TODO
+ public void calculateEntropy() {}
   
   public KMeansClustering(ArrayList<Data> data, int k, ArrayList<String> classLabels) {
     this.k = k;
     this.data = data;
-	this.classLabels = classLabels;
+ this.classLabels = classLabels;
   }
   
   public KMeansClustering(String filename, int k) throws IOException {
@@ -96,36 +96,36 @@ public class KMeansClustering {
     file.close();
     return allData;
   }
-	//TODO
-	public KMeansClustering cluster(boolean euclidean) {
-		
-	}
-	
-	//TODO
-	public void output(KMeansClustering current) {
-		
-	}
-	
+ //TODO
+ public KMeansClustering cluster(boolean euclidean) {
+  
+ }
+ 
+ //TODO
+ public void output(KMeansClustering current) {
+  
+ }
+ 
   
   public static void main(String[] args) throws IOException {
     ArrayList<Data> initData = readARFF(args[0]);
-	ArrayList<String> classLabels = new ArrayList<String>();
-	classLabels.add(initialData.get(0).getClassLabel());
-	for (int i = 1; i < initialData.size(); i++) {
-		String current = initialData.get(i).getClassLabel();
-		if (!classLabels.contains(current)) {
-			classLabels.add(current);
-		}
-	}
-	KMeansClustering initCluster = new KMeansClustering(initData, classLabels.size(), classLabels);
-	KMeansClustering initDoubleCluster = new KMeansClustering(initData, classLabels.size() * 2, classLabels);
-	KMeansClustering initTripleCluster = new KMeansClustering(initData, classLabels.size() * 3, classLabels);
-	
-	KMeansClustering clusterEuc = initCluster.cluster(true);
-	KMeansClustering doubleClusterEuc = initDoubleCluster.cluster(true);
-	KMeansClustering tripleClusterEuc = initTripleCluster.cluster(true);
-	KMeansClustering clusterMan = initCluster.cluster(false);
-	KMeansClustering doubleClusterMan = initDoubleCluster.cluster(false);
-	KMeansClustering tripleClusterMan = initTripleCluster.cluster(false);
+ ArrayList<String> classLabels = new ArrayList<String>();
+ classLabels.add(initialData.get(0).getClassLabel());
+ for (int i = 1; i < initialData.size(); i++) {
+  String current = initialData.get(i).getClassLabel();
+  if (!classLabels.contains(current)) {
+   classLabels.add(current);
+  }
+ }
+ KMeansClustering initCluster = new KMeansClustering(initData, classLabels.size(), classLabels);
+ KMeansClustering initDoubleCluster = new KMeansClustering(initData, classLabels.size() * 2, classLabels);
+ KMeansClustering initTripleCluster = new KMeansClustering(initData, classLabels.size() * 3, classLabels);
+ 
+ KMeansClustering clusterEuc = initCluster.cluster(true);
+ KMeansClustering doubleClusterEuc = initDoubleCluster.cluster(true);
+ KMeansClustering tripleClusterEuc = initTripleCluster.cluster(true);
+ KMeansClustering clusterMan = initCluster.cluster(false);
+ KMeansClustering doubleClusterMan = initDoubleCluster.cluster(false);
+ KMeansClustering tripleClusterMan = initTripleCluster.cluster(false);
   }
 }

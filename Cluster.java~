@@ -3,10 +3,8 @@ import java.util.*;
 public class Cluster {
  private Data centroid;
  private ArrayList<Data> cluster;
- private double eucWSSmeasure;
- private double eucBSSmeasure;
- private double manWSSmeasure;
- private double manBSSmeasure;
+ private double eucWSSmeasure= 0;
+ private double manWSSmeasure = 0;
  private double entropy;
  
  public Cluster(Data centroid, ArrayList<Data> cluster) {
@@ -16,43 +14,25 @@ public class Cluster {
  
  //Getters
  public double getEucWSS() {return this.eucWSSmeasure;}
- public double getEucBSS() {return this.eucBSSmeasure;}
+ public Data getCentroid() {return this.centroid;}
+ public ArrayList<Data> getCluster() {return this.cluster;}
  public double getManWSS() {return this.manWSSmeasure;}
- public double getManBSS() {return this.manBSSmeasure;}
+ 
  public double getEntropy() {return this.entropy;}
  
- public void calculateEucWSS() {
+ public void calculateWSS() {
    for (int i = 0; i < cluster.size(); i++) {
      double sum = 0;
-     for (Iterator<String> stuff = cluster.get(i).getAttributes().getKeys().iterator() ; stuff.hasNext();) {
+     double value = 0;
+     for (Iterator<String> stuff = cluster.get(i).getAttributes().keySet().iterator() ; stuff.hasNext();) {
        String current = stuff.next();
-       sum += Math.abs(centroid.getAttribute(current) - cluster.get(i).getAttribute(current));
+       double manValue = Math.pow(centroid.getAttribute(current) - cluster.get(i).getAttribute(current), 2);
+       eucWSSmeasure += Math.pow(manValue, 2);
+       manWSSmeasure += manValue;
      }
    }
  }
-   
-       
-   
- 
- 
- 
- //TODO
- public void calculateEucBSS(boolean Euclidean) {
-   for (int i = 0; i < cluster.size(); i++) {
-     double mainCentroid = 0;
- }
- 
-
- public void calculateManWSS() {
-   ManWSSmeasure = Math.abs(this.centroid.getAttributes() - cluster.getAttributes()); 
- }
- 
- //TODO
- public void calculateManBSS(boolean Euclidean) {
-   for(int i = 0; i<cluster.size(); i++){
-     ManBSSmeasure = Math.abs(this.centroid.getAttributes() - cluster.get(i)getAttributes());
-   }
- }
+     
  
  //TODO
  public void calculateEntropy(boolean Euclidean) {

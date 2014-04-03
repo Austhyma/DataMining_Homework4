@@ -16,6 +16,11 @@ public class Data {
     this.iD = iD;
   }
   
+  public Data(HashMap<String, Double> dimensions) {
+    this.attributes = dimensions;
+
+  }
+  
   public String getClassLabel() {return classLabel;}
   public HashMap<String, Double> getAttributes() {return this.attributes;}
   public int getID() {return this.iD;}

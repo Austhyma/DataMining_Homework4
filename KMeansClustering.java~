@@ -21,10 +21,37 @@ public class KMeansClustering {
  public double getEntropy() {return this.entropy;}
  
  //TODO
- public void calculateWSS() {}
+ public void calculateWSS() {
+  
+ }
+ 
+ 
  
  //TODO
- public void calculateBSS() {}
+ public void calculateBSS() {
+   Data mainCentroid;
+   double sum = 0;
+   HashMap<Data, Double> dataAttributes;
+   for (int i = 0; i < clusters.size(); i++) {
+     for (int j = 0; j < clusters.get(i).getCluster().size(); j++) {
+       Data current = clusters.get(i).getCluster().get(j);
+       if (i == 0) {
+         dataAttributes.put(current, (clusters.get(i).getCentroid())/clusters.size());
+       }
+       else {
+         dataAttributes.put(current, dataAttributes.get(current) + (clusters.get(i).get(current))/clusters.size());
+       }
+     }
+   }
+   
+   
+   
+ }
+   
+       
+       
+     
+ 
  
  //TODO
  public void calculateEntropy() {}
@@ -32,7 +59,7 @@ public class KMeansClustering {
   public KMeansClustering(ArrayList<Data> data, int k, ArrayList<String> classLabels) {
     this.k = k;
     this.data = data;
- this.classLabels = classLabels;
+    this.classLabels = classLabels;
   }
   
   public KMeansClustering(String filename, int k) throws IOException {
@@ -108,8 +135,8 @@ public class KMeansClustering {
  
   
   public static void main(String[] args) throws IOException {
-    ArrayList<Data> initData = readARFF(args[0]);
- ArrayList<String> classLabels = new ArrayList<String>();
+   ArrayList<Data> initData = readARFF(args[0]);
+   ArrayList<String> classLabels = new ArrayList<String>();
  classLabels.add(initialData.get(0).getClassLabel());
  for (int i = 1; i < initialData.size(); i++) {
   String current = initialData.get(i).getClassLabel();

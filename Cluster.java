@@ -5,7 +5,7 @@ public class Cluster {
  private ArrayList<Data> cluster;
  private double eucWSSmeasure= 0;
  private double manWSSmeasure = 0;
- private double entropy;
+ private double entropy = 0;
  
  public Cluster(Data centroid, ArrayList<Data> cluster) {
   this.centroid = centroid;
@@ -30,11 +30,25 @@ public class Cluster {
      }
    }
  }
+ 
+ public int classCount(String classLabel) {
+   int counter = 0;
+   for (int i = 0; i < cluster.size(); i++) {
+     if (classLabel.equals(cluster.get(i).getClassLabel())) { counter++;}
+   }
+   return counter;
+ }
      
  
  //TODO
- public void calculateEntropy(boolean Euclidean) {
-  }
-}
+ public void calculateEntropy() {
+   for (int i = 0; i < cluster.size(); i++) {
+        entropy -= -((classCount(cluster.get(i).getClassLabel()))/cluster.size()*Math.log(classCount(cluster.get(i).getClassLabel())))/Math.log(2);
+      }
+   }
+ }
+        
+  
+
 
  

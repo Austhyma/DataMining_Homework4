@@ -22,8 +22,6 @@ public class Cluster {
  
  public void calculateWSS() {
    for (int i = 0; i < cluster.size(); i++) {
-     double sum = 0;
-     double value = 0;
      for (Iterator<String> stuff = cluster.get(i).getAttributes().keySet().iterator() ; stuff.hasNext();) {
        String current = stuff.next();
        double manValue = Math.pow(centroid.getAttribute(current) - cluster.get(i).getAttribute(current), 2);

@@ -26,9 +26,8 @@ public class KMeansClustering {
  public double getEntropy() {return this.entropy;}
  
  //TODO
- public void calculateWSS() {
-  
- }
+ //public void calculateWSS() {}
+ 
  
  
  
@@ -49,14 +48,21 @@ public class KMeansClustering {
        }
      }
    }
-   //for (int i = 0; i < clusters.size(); i++) {
-     //for (int j = 0; j < clusters.get(i).getCluster().size(); j++) {
-       //for (Iterator<String> stuff = clusters.get(i).getCentroid().getAttributes().keySet().iterator(); stuff.hasNext();) {
-         //String current = stuff.next();
-         //double manValue = Math.pow(clusters.get(i).getCluster().getCentroid().get(
+   for (int i = 0; i < clusters.size(); i++) {
+     for (int j = 0; j < clusters.get(i).getCluster().size(); j++) {
+       for (Iterator<String> stuff = clusters.get(i).getCentroid().getAttributes().keySet().iterator(); stuff.hasNext();) {
+         String current = stuff.next();
+         double value = Math.pow((clusters.get(i).getCentroid().getAttribute(current) - dataAttributes.get(current) + (clusters.get(i).getCentroid().getAttributes().get(current))/clusters.size()), 2);
+         double manValue = value * clusters.get(i).getCluster().size();
+         manBSS += manValue;
+         eucBSS += Math.pow(manValue, 2);
+       }
+     }
+   }
+ }
      
    
- }
+ 
      
  
  

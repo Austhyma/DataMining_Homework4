@@ -11,13 +11,18 @@ public class KMeansClustering {
  private ArrayList<Data> data;
  private ArrayList<Cluster> clusters;
  private ArrayList<String> classLabels;
- private double WSS;
- private double BSS;
+ private double manWSS = 0;
+ private double eucWSS = 0;
  private double entropy;
+ private double manBSS = 0;
+ private double eucBSS = 0;
+   
  
  //Getters
- public double getWSS() {return this.WSS;}
- public double getBSS() {return this.BSS;}
+ public double getEucWSS() {return this.eucWSS;}
+ public double getManWSS() {return this.manWSS;}
+ public double getEucBSS() {return this.eucBSS;}
+ public double getManBSS() {return this.manBSS;}
  public double getEntropy() {return this.entropy;}
  
  //TODO
@@ -29,27 +34,33 @@ public class KMeansClustering {
  
  //TODO
  public void calculateBSS() {
-   Data mainCentroid;
-   double sum = 0;
-   HashMap<Data, Double> dataAttributes;
+  
+   HashMap<String, Double> dataAttributes = new HashMap<String, Double>();
    for (int i = 0; i < clusters.size(); i++) {
      for (int j = 0; j < clusters.get(i).getCluster().size(); j++) {
-       Data current = clusters.get(i).getCluster().get(j);
-       if (i == 0) {
-         dataAttributes.put(current, (clusters.get(i).getCentroid())/clusters.size());
-       }
-       else {
-         dataAttributes.put(current, dataAttributes.get(current) + (clusters.get(i).get(current))/clusters.size());
+       for (Iterator<String> stuff = clusters.get(i).getCluster().get(j).getAttributes().keySet().iterator(); stuff.hasNext();) {         
+         String current = stuff.next();
+         if (i == 0) {
+           dataAttributes.put(current, (clusters.get(i).getCentroid().getAttributes().get(current))/clusters.size());
+         }
+         else {
+           dataAttributes.put(current, dataAttributes.get(current) + (clusters.get(i).getCentroid().getAttributes().get(current))/clusters.size());
+         }
        }
      }
    }
-   
-   
-   
+   for (int i = 0; i < clusters.size(); i++) {
+     for (int j = 0; j < clusters.get(i).getCluster().size(); j++) {
+       for (Iterator<String> stuff = clusters.get(i).getCentroid().getAttributes().keySet().iterator(); stuff.hasNext();) {
+         String current = stuff.next();
+         double manValue = Math.pow((clusters.get(i).getCentroid().getAttribute(current) - dataAttributes.get(current) + (clusters.get(i).getCentroid().getAttributes().get(current))/clusters.size()), 2);
+       }
+     }
+   }
  }
+     
    
-       
-       
+ 
      
  
  
@@ -124,9 +135,10 @@ public class KMeansClustering {
     return allData;
   }
  //TODO
- public KMeansClustering cluster(boolean euclidean) {
-  
- }
+  public KMeansClustering cluster(boolean euclidean) {
+    return null;
+  }
+     
  
  //TODO
  public void output(KMeansClustering current) {
@@ -137,9 +149,9 @@ public class KMeansClustering {
   public static void main(String[] args) throws IOException {
    ArrayList<Data> initData = readARFF(args[0]);
    ArrayList<String> classLabels = new ArrayList<String>();
- classLabels.add(initialData.get(0).getClassLabel());
- for (int i = 1; i < initialData.size(); i++) {
-  String current = initialData.get(i).getClassLabel();
+ classLabels.add(initData.get(0).getClassLabel());
+ for (int i = 1; i < initData.size(); i++) {
+  String current = initData.get(i).getClassLabel();
   if (!classLabels.contains(current)) {
    classLabels.add(current);
   }

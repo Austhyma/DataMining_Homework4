@@ -31,21 +31,30 @@ public class Cluster {
    }
  }
  
- public int classCount(String classLabel) {
-   int counter = 0;
+ public double classCount(String classLabel) {
+   double counter = 0;
    for (int i = 0; i < cluster.size(); i++) {
      if (classLabel.equals(cluster.get(i).getClassLabel())) { counter++;}
    }
    return counter;
  }
+ 
+ public double log(double value, int base) {
+   return Math.log(value)/Math.log(base);
+ }
+ 
      
  
  //TODO
- public void calculateEntropy() {
-   for (int i = 0; i < cluster.size(); i++) {
-        entropy -= -((classCount(cluster.get(i).getClassLabel()))/cluster.size()*Math.log(classCount(cluster.get(i).getClassLabel())))/Math.log(2);
-      }
+ public void calculateEntropy(ArrayList<String> classLabels) {
+   double entropySum = 0;
+   for (int i = 0; i < classLabels.size(); i++) {
+     double probability = classCount(classLabels.get(i))/(double) cluster.size();
+     entropySum += -(probability * log(probability, classLabels.size()));
    }
+ }
+       
+     
  }
         
   

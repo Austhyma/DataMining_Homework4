@@ -4,18 +4,20 @@
 
 import java.io.*;
 import java.util.*;
+import java.math.*;
 
 public class KMeansClustering {
   
  private int k;
  private ArrayList<Data> data;
- private ArrayList<Cluster> clusters;
+ private ArrayList<Cluster> clusters = new ArrayList<Cluster>();
  private ArrayList<String> classLabels;
  private double manWSS = 0;
  private double eucWSS = 0;
- private double entropy;
+ private double infoGain;
  private double manBSS = 0;
  private double eucBSS = 0;
+ private boolean euclidean;
    
  
  //Getters
@@ -23,17 +25,22 @@ public class KMeansClustering {
  public double getManWSS() {return this.manWSS;}
  public double getEucBSS() {return this.eucBSS;}
  public double getManBSS() {return this.manBSS;}
- public double getEntropy() {return this.entropy;}
- 
- //TODO
- //public void calculateWSS() {}
+ public double getEntropy() {return this.infoGain;}
  
  
+ public void calculateWSS() {
+   for (int i = 0; i < clusters.size(); i++) {
+     clusters.get(i).calculateWSS();
+     eucWSS += clusters.get(i).getEucWSS();
+     manWSS += clusters.get(i).getManWSS();
+   }  
+ }
  
  
- //TODO
+ 
+ 
+ 
  public void calculateBSS() {
-  
    HashMap<String, Double> dataAttributes = new HashMap<String, Double>();
    for (int i = 0; i < clusters.size(); i++) {
      for (int j = 0; j < clusters.get(i).getCluster().size(); j++) {
@@ -60,24 +67,30 @@ public class KMeansClustering {
      }
    }
  }
-     
-   
- 
-     
- 
- 
+
  //TODO
- public void calculateEntropy() {}
+ public void calculateEntropy() {
+   for (int i = 0; i < clusters.size(); i++) {
+     clusters.get(i).calculateEntropy(classLabels);
+     infoGain += 1 - ((clusters.get(i).classCount(clusters.get(i).getCluster().get(i).getClassLabel())/clusters.get(i).getCluster().size()) * clusters.get(i).getEntropy());
+   }
+ }
+                      
+     
+ 
   
-  public KMeansClustering(ArrayList<Data> data, int k, ArrayList<String> classLabels) {
+  public KMeansClustering(ArrayList<Data> data, int k, ArrayList<String> classLabels, boolean euclidean) {
     this.k = k;
     this.data = data;
     this.classLabels = classLabels;
+	this.euclidean = euclidean;
+	kMeans();
   }
   
   public KMeansClustering(String filename, int k) throws IOException {
     this.k = k;
     this.data = readARFF(filename);
+	kMeans();
   }
   
   public int getK() {return k;}
@@ -137,9 +150,76 @@ public class KMeansClustering {
     return allData;
   }
  //TODO
-  public KMeansClustering cluster(boolean euclidean) {
-    return null;
+  public void kMeans() {
+	ArrayList<Data> centroids = new ArrayList<Data>();
+	//select k points as initial centroids
+    for (int i = 0; i < k; i++) {
+		int randomValue = (int) Math.round(Math.random()*(this.data.size() - 1));
+		Data centroid = this.data.get(randomValue);
+		this.clusters.add(new Cluster(centroid));
+		centroids.add(centroid);
+	}
+	ArrayList<Data> oldCentroids = centroids;
+	int iterations = 0;
+	boolean complete = false;
+	while (!complete) {
+		System.out.println("Iteration: " + iterations);
+		for (int i = 0; i < centroids.size(); i++) {
+			String line = "Cluster: " + i + " =";
+			int count = 0;
+			for (Iterator<String> attribute = centroids.get(i).getAttributes().keySet().iterator(); attribute.hasNext();) {
+				if (count > 3) break;
+				else line += " " + centroids.get(i).getAttributes().get(attribute.next());
+				count++;
+			}
+			System.out.println(line);
+		}
+		cluster();
+		centroids = computeCentroid();
+		iterations++;
+		complete = oldCentroids.equals(centroids);
+	}
   }
+
+	public void cluster() {
+		//Associates points with nearest centroid
+		for (int i = 0; i < this.data.size(); i++) {
+			int closestCentroid = 0;
+			double smallest = -1;
+			for (int j = 0; j < this.clusters.size(); j++) {
+				double distance = 0;
+				for (Iterator<String> attribute = this.data.get(i).getAttributes().keySet().iterator(); attribute.hasNext();) {
+					String current = attribute.next();
+					double manValue = Math.abs(this.data.get(i).getAttribute(current) - this.clusters.get(j).getCentroid().getAttributes().get(current));
+					distance += (this.euclidean) ? Math.pow(manValue, 2) : manValue;
+				}
+				if (distance > smallest) {closestCentroid = j; smallest = distance;}
+			}
+			this.clusters.get(closestCentroid).addPoint(this.data.get(i));
+		}
+	}
+	
+	public double round(double value, int places) {
+		return new BigDecimal(value).setScale(places, RoundingMode.HALF_UP).doubleValue();
+	}
+	
+	public ArrayList<Data> computeCentroid() {
+		ArrayList<Data> returnValues = new ArrayList<Data>();
+		for (int i = 0; i < this.clusters.size(); i++) {
+			HashMap<String, Double> dataAttributes = new HashMap<String, Double>();
+			for (int j = 0; j < this.clusters.get(i).getCluster().size(); j++) {
+				Data data = this.clusters.get(i).getCluster().get(j);
+				for (Iterator<String> attribute = clusters.get(i).getCentroid().getAttributes().keySet().iterator(); attribute.hasNext();) {
+					String current = attribute.next();
+					double total = (double) this.clusters.get(i).getCluster().size();
+					double value = (j == 0) ? (data.getAttribute(current)/total) : (dataAttributes.get(current) + data.getAttribute(current)/total);
+					dataAttributes.put(current, value);
+				}
+			}
+			returnValues.add(new Data(dataAttributes));
+		}
+		return returnValues;
+	}
      
  
  //TODO
@@ -154,19 +234,16 @@ public class KMeansClustering {
  classLabels.add(initData.get(0).getClassLabel());
  for (int i = 1; i < initData.size(); i++) {
   String current = initData.get(i).getClassLabel();
-  if (!classLabels.contains(current)) {
+  if (!classLabels.contains(current) && !current.equals(" ")) {
    classLabels.add(current);
   }
  }
- KMeansClustering initCluster = new KMeansClustering(initData, classLabels.size(), classLabels);
- KMeansClustering initDoubleCluster = new KMeansClustering(initData, classLabels.size() * 2, classLabels);
- KMeansClustering initTripleCluster = new KMeansClustering(initData, classLabels.size() * 3, classLabels);
  
- KMeansClustering clusterEuc = initCluster.cluster(true);
- KMeansClustering doubleClusterEuc = initDoubleCluster.cluster(true);
- KMeansClustering tripleClusterEuc = initTripleCluster.cluster(true);
- KMeansClustering clusterMan = initCluster.cluster(false);
- KMeansClustering doubleClusterMan = initDoubleCluster.cluster(false);
- KMeansClustering tripleClusterMan = initTripleCluster.cluster(false);
+ KMeansClustering clusterEuc = new KMeansClustering(initData, classLabels.size(), classLabels, true);
+ KMeansClustering doubleClusterEuc = new KMeansClustering(initData, classLabels.size() * 2, classLabels, true);
+ KMeansClustering tripleClusterEuc = new KMeansClustering(initData, classLabels.size() * 3, classLabels, true);
+ KMeansClustering clusterMan = new KMeansClustering(initData, classLabels.size(), classLabels, false);
+ KMeansClustering doubleClusterMan = new KMeansClustering(initData, classLabels.size() * 2, classLabels, false);
+ KMeansClustering tripleClusterMan = new KMeansClustering(initData, classLabels.size() * 3, classLabels, false);
   }
 }

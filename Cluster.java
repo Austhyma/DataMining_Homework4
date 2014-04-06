@@ -7,9 +7,9 @@ public class Cluster {
  private double manWSSmeasure = 0;
  private double entropy = 0;
  
- public Cluster(Data centroid, ArrayList<Data> cluster) {
+ public Cluster(Data centroid) {
   this.centroid = centroid;
-  this.cluster = cluster;
+	this.cluster = new ArrayList<Data>();
  }
  
  //Getters
@@ -52,6 +52,10 @@ public class Cluster {
      double probability = classCount(classLabels.get(i))/(double) cluster.size();
      entropySum += -(probability * log(probability, classLabels.size()));
    }
+
+	public void addPoint(Data point) {
+		this.cluster.add(point);
+	}
  }
        
      

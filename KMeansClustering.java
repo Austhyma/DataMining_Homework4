@@ -158,7 +158,7 @@ public class KMeansClustering {
     ArrayList<Data> oldCentroids = centroids;
     int iterations = 0;
     boolean complete = false;
-    while (!complete) {
+    while (!complete && iterations<100) {
       System.out.println("Iteration: " + iterations);
       for (int i = 0; i < centroids.size(); i++) {
         String line = "Cluster: " + i + " =";

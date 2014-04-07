@@ -53,27 +53,31 @@ public class Cluster {
   }
  
   //TODO
-  public void calculateSplitInfo(ArrayList<String> classLabels, ArrayList<Data> data) {
+  /*public void weightedEntropy(ArrayList<String> classLabels, ArrayList<Data> data) {
     for (int i = 0; i < classLabels.size(); i++) {     
-      double probability = classCount2(classLabels.get(i), data)/(double) data.size();
+      double probability = this.cluster.size()/data.size() * this.cluster.getEntropy();
       this.weightedEntropy += -(probability * log(probability, classLabels.size()));
     }
-  }
+  }*/
     
   public void addPoint(Data point) {
     this.cluster.add(point);
   }
   
-  public double log(double value, int base) {
+  public double log(double value, double base) {
     return Math.log(value)/Math.log(base);
   }
   
   //TODO
   public void calculateEntropy(ArrayList<String> classLabels) {
-    double entropySum = 0;
     for (int i = 0; i < classLabels.size(); i++) {
       double probability = classCount(classLabels.get(i))/(double) cluster.size();
-      entropySum += -(probability * log(probability, classLabels.size()));
+      if (probability == 0) {
+        this.entropy += 0;
+      }
+      else {
+        this.entropy -= (probability * log(probability, classLabels.size()));
+      }
     }
   }
 }

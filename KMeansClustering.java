@@ -33,6 +33,12 @@ public class KMeansClustering {
   public int getK() {return k;}
   public ArrayList<Data> getData() {return data;}
   
+  public void computeGoodness() {
+    calculateWSS();
+    calculateBSS();
+    calculateEntropy();
+  }
+  
   public void calculateWSS() {
     for (int i = 0; i < clusters.size(); i++) {
       clusters.get(i).calculateWSS();
@@ -72,9 +78,16 @@ public class KMeansClustering {
   //TODO
   public void calculateEntropy() {
     for (int i = 0; i < clusters.size(); i++) {
-      clusters.get(i).calculateEntropy(classLabels);
-      infoGain += 1 - ((clusters.get(i).classCount(clusters.get(i).getCluster().get(i).getClassLabel())/clusters.get(i).getCluster().size()) * clusters.get(i).getEntropy());
+      Cluster current = clusters.get(i);
+      current.calculateEntropy(classLabels);
+      double numClassLabel = current.getCluster().size();
+//      System.out.println("NumClassLabel: " + numClassLabel);
+//      System.out.println("Weight: " + numClassLabel/this.data.size());
+//      System.out.println("Current Entropy: " + current.getEntropy());
+      this.weightedEntropy += (numClassLabel/this.data.size()) * current.getEntropy();
     }
+    
+    this.infoGain = 1 - this.weightedEntropy;
   }           
   
   public KMeansClustering(ArrayList<Data> data, int k, ArrayList<String> classLabels, boolean euclidean) {
@@ -164,8 +177,6 @@ public class KMeansClustering {
     int iterations = 0;
     boolean complete = false;
     while (!complete && iterations<100) {
-      
-      System.out.println("Iteration: " + iterations);
 //      for (int i = 0; i < centroids.size(); i++) {
 //        String line = "Cluster: " + i + " =";
 //        int count = 0;
@@ -317,6 +328,7 @@ public class KMeansClustering {
         classLabels.add(current);
       }
     }
+    System.out.println("File Processed");
     
     KMeansClustering clusterEuc = new KMeansClustering(initData, classLabels.size(), classLabels, true);
     KMeansClustering doubleClusterEuc = new KMeansClustering(initData, classLabels.size() * 2, classLabels, true);
@@ -324,8 +336,14 @@ public class KMeansClustering {
     KMeansClustering clusterMan = new KMeansClustering(initData, classLabels.size(), classLabels, false);
     KMeansClustering doubleClusterMan = new KMeansClustering(initData, classLabels.size() * 2, classLabels, false);
     KMeansClustering tripleClusterMan = new KMeansClustering(initData, classLabels.size() * 3, classLabels, false);
+    System.out.println("KMeans Implemented");
     ArrayList<KMeansClustering> stuff = new ArrayList<KMeansClustering>(Arrays.asList(clusterEuc, doubleClusterEuc, tripleClusterEuc, clusterMan, doubleClusterMan, tripleClusterMan));
+    System.out.println("Generating Goodness");
+    for (int i = 0; i < stuff.size(); i++) {
+      stuff.get(i).computeGoodness();
+    }
     String filename = args[0].substring(0, args[0].indexOf("."));
     output(stuff, filename);
+    System.out.println("Complete");
   }
 }

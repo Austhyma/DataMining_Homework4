@@ -212,7 +212,8 @@ public class KMeansClustering {
           dataAttributes.put(current, value);
         }
       }
-      returnValues.add(new Data(dataAttributes));
+      if (this.clusters.get(i).getCluster().size() > 0) {this.clusters.get(i).setCentroid(new Data(dataAttributes)); returnValues.add(new Data(dataAttributes));}
+      else {returnValues.add(this.clusters.get(i).getCentroid()); this.clusters.get(i).setCentroid(this.clusters.get(i).getCentroid());}
     }
     return returnValues;
   }
@@ -267,10 +268,11 @@ public class KMeansClustering {
     classLabels.add(initData.get(0).getClassLabel());
     for (int i = 1; i < initData.size(); i++) {
       String current = initData.get(i).getClassLabel();
-      if (!classLabels.contains(current) && !current.equals(" ")) {
+      if (!classLabels.contains(current) && !current.equals("")) {
         classLabels.add(current);
       }
     }
+    System.out.println(classLabels.toString());
     
     KMeansClustering clusterEuc = new KMeansClustering(initData, classLabels.size(), classLabels, true);
     KMeansClustering doubleClusterEuc = new KMeansClustering(initData, classLabels.size() * 2, classLabels, true);

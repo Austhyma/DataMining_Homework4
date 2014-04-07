@@ -19,6 +19,8 @@ public class Cluster {
   public ArrayList<Data> getCluster() {return this.cluster;}
   public double getManWSS() {return this.manWSSmeasure;}
   public double getWeightedEntropy() {return this.weightedEntropy;}
+  //Setters
+  public void setCentroid(Data centroid) {this.centroid = centroid;}
   
   public double getEntropy() {return this.entropy;}
   
@@ -44,7 +46,7 @@ public class Cluster {
   public double classCount2(String classLabel, ArrayList<Data> data) {
     double counter = 0; 
     for (int i = 0; i < data.size(); i++) {
-      counter = (classLabel.equals(data.get(i).getClassLabel())) ? counter+1 : counter;
+      counter += (classLabel.equals(data.get(i).getClassLabel())) ? 1 : 0;
     }
     return counter;
   }
@@ -64,8 +66,6 @@ public class Cluster {
   public double log(double value, int base) {
     return Math.log(value)/Math.log(base);
   }
-  
-  
   
   //TODO
   public void calculateEntropy(ArrayList<String> classLabels) {

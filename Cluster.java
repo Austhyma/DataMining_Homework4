@@ -8,9 +8,9 @@ public class Cluster {
  private double entropy = 0;
  private double splitInfo = 0;
  
- public Cluster(Data centroid, ArrayList<Data> cluster) {
+ public Cluster(Data centroid) {
   this.centroid = centroid;
-  this.cluster = cluster;
+	this.cluster = new ArrayList<Data>();
  }
  
  //Getters
@@ -72,6 +72,10 @@ public class Cluster {
      double probability = classCount2(classLabels.get(i), data)/(double) data.size();
      splitInfo += -(probability * log(probability, classLabels.size()));
    }
+
+	public void addPoint(Data point) {
+		this.cluster.add(point);
+	}
  }
        
      

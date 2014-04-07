@@ -10,7 +10,10 @@ public class Data {
   protected int iD;
   protected HashMap<String, Double> attributes;
   protected String classLabel;
+  protected int closestCentroid;
   
+  public void setClosestCentroid(int closestCentroid) {this.closestCentroid = closestCentroid;}
+  public int getClosestCentroid() {return this.closestCentroid;}
   public Data(HashMap<String, Double> dimensions, String classLabel, int iD) {
     this.attributes = dimensions;
     this.classLabel = classLabel;

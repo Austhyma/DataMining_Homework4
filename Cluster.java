@@ -21,6 +21,7 @@ public class Cluster {
   public double getWeightedEntropy() {return this.weightedEntropy;}
   //Setters
   public void setCentroid(Data centroid) {this.centroid = centroid;}
+  public void setCluster(ArrayList<Data> cluster) {this.cluster = cluster;}
   
   public double getEntropy() {return this.entropy;}
   

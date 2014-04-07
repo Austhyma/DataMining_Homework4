@@ -30,6 +30,8 @@ public class KMeansClustering {
   public ArrayList<Cluster> getClusters() {return this.clusters;}
   public boolean getEuclidean() {return this.euclidean;}
   public double getWeightedEntropy() {return this.weightedEntropy;}
+  public int getK() {return k;}
+  public ArrayList<Data> getData() {return data;}
   
   public void calculateWSS() {
     for (int i = 0; i < clusters.size(); i++) {
@@ -89,9 +91,6 @@ public class KMeansClustering {
     kMeans();
   }
   
-  public int getK() {return k;}
-  public ArrayList<Data> getData() {return data;}
-  
   public static ArrayList<Data> readARFF(String fileName) throws IOException{
     BufferedReader file;
     ArrayList<String> attributeNames = new ArrayList<String>();
@@ -145,6 +144,7 @@ public class KMeansClustering {
     file.close();
     return allData;
   }
+  
   //TODO
   public void kMeans() {
     ArrayList<Data> centroids = new ArrayList<Data>();
@@ -164,13 +164,18 @@ public class KMeansClustering {
         String line = "Cluster: " + i + " =";
         int count = 0;
         for (Iterator<String> attribute = centroids.get(i).getAttributes().keySet().iterator(); attribute.hasNext();) {
+          String current = attribute.next();
           if (count > 3) break;
-          else line += " " + centroids.get(i).getAttributes().get(attribute.next());
+          else line += " " + current + ": " + round(centroids.get(i).getAttributes().get(current), 5);
           count++;
         }
         System.out.println(line);
       }
       cluster();
+//      System.out.println("Iteration: " + iterations);
+//      for (int i = 0; i < this.clusters.size(); i++) {
+//        System.out.println("\tCluster " + i + ": " + this.clusters.get(i).getCluster().size());
+//      }
       centroids = computeCentroid();
       iterations++;
       complete = oldCentroids.equals(centroids);
@@ -181,18 +186,31 @@ public class KMeansClustering {
     //Associates points with nearest centroid
     for (int i = 0; i < this.data.size(); i++) {
       int closestCentroid = 0;
-      double smallest = -1;
+      double smallest = Double.POSITIVE_INFINITY;
       for (int j = 0; j < this.clusters.size(); j++) {
-        double distance = 0;
-        for (Iterator<String> attribute = this.data.get(i).getAttributes().keySet().iterator(); attribute.hasNext();) {
-          String current = attribute.next();
-          double manValue = Math.abs(this.data.get(i).getAttribute(current) - this.clusters.get(j).getCentroid().getAttributes().get(current));
-          distance += (this.euclidean) ? Math.pow(manValue, 2) : manValue;
-        }
-        if (distance > smallest) {closestCentroid = j; smallest = distance;}
+        double distance = distance(this.data.get(i), this.clusters.get(j).getCentroid(), euclidean);
+        if (distance < smallest) {closestCentroid = j; smallest = distance;}
       }
-      this.clusters.get(closestCentroid).addPoint(this.data.get(i));
+      this.data.get(i).setClosestCentroid(closestCentroid);
     }
+    //Adds all points to their nearest cluster
+    for (int i = 0; i < this.clusters.size(); i++) {
+      ArrayList<Data> newStuff = new ArrayList<Data>();
+      for (int j = 0; j < this.data.size(); j++) {
+        if (this.data.get(j).getClosestCentroid() == i) newStuff.add(this.data.get(j));
+      }
+      this.clusters.get(i).setCluster(newStuff);
+    }
+  }
+  
+  public double distance(Data current, Data centroid, boolean euclidean) {
+    double distance = 0;
+    for (Iterator<String> attribute = current.getAttributes().keySet().iterator(); attribute.hasNext();) {
+      String currentAttribute = attribute.next();
+      double manValue = Math.abs(current.getAttribute(currentAttribute) - centroid.getAttributes().get(currentAttribute));
+      distance += (euclidean) ? Math.pow(manValue, 2) : manValue;
+    }
+    return distance;
   }
   
   public double round(double value, int places) {
@@ -201,8 +219,10 @@ public class KMeansClustering {
   
   public ArrayList<Data> computeCentroid() {
     ArrayList<Data> returnValues = new ArrayList<Data>();
+    //For each cluster
     for (int i = 0; i < this.clusters.size(); i++) {
       HashMap<String, Double> dataAttributes = new HashMap<String, Double>();
+      //For each point in each cluster
       for (int j = 0; j < this.clusters.get(i).getCluster().size(); j++) {
         Data data = this.clusters.get(i).getCluster().get(j);
         for (Iterator<String> attribute = clusters.get(i).getCentroid().getAttributes().keySet().iterator(); attribute.hasNext();) {
@@ -212,8 +232,8 @@ public class KMeansClustering {
           dataAttributes.put(current, value);
         }
       }
-      if (this.clusters.get(i).getCluster().size() > 0) {this.clusters.get(i).setCentroid(new Data(dataAttributes)); returnValues.add(new Data(dataAttributes));}
-      else {returnValues.add(this.clusters.get(i).getCentroid()); this.clusters.get(i).setCentroid(this.clusters.get(i).getCentroid());}
+      this.clusters.get(i).setCentroid(new Data(dataAttributes)); 
+      returnValues.add(new Data(dataAttributes));
     }
     return returnValues;
   }
@@ -228,13 +248,15 @@ public class KMeansClustering {
     
     //Report cohesion and separation using WSS and BSS
     for(int i = 0; i < current.size(); i++) {
-      outFile.println("Euclidean, WSS, BSS, Entropy, Weighted Entropy");
+      String tableColumns = (current.get(i).getEuclidean()) ? "Euclidean," : "Manhattan,";
+      tableColumns += "WSS,BSS,InformationGain,WeightedEntropy";
+      outFile.println(tableColumns);
       if(current.get(i).getEuclidean()){     
-        String line = "k = " + current.get(i).classLabels.size() + ", " + current.get(i).getEucWSS() + ", " + current.get(i).getEucBSS() + ", " 
+        String line = "k = " + current.get(i).getK() + ", " + current.get(i).getEucWSS() + ", " + current.get(i).getEucBSS() + ", " 
           + current.get(i).getEntropy() + ", " + current.get(i).getWeightedEntropy() + ", ";
         outFile.println(line);
       }else {     
-        String line = "k = " + current.get(i).classLabels.size() + ", " + current.get(i).getManWSS() + ", " + current.get(i).getManBSS() + ", " 
+        String line = "k = " + current.get(i).getK() + ", " + current.get(i).getManWSS() + ", " + current.get(i).getManBSS() + ", " 
           + current.get(i).getEntropy() + ", " + current.get(i).getWeightedEntropy() + ", ";
         outFile.println(line);
       } 
@@ -243,7 +265,9 @@ public class KMeansClustering {
     
     //Report Entropy per cluster with total weighted entropy
     for(int i = 0; i < current.size(); i++) {
-      outFile.println("Euclidean, Entropy, Weighted Entropy");
+      String clusterColumns = (current.get(i).getEuclidean()) ? "Euclidean," : "Manhattan,";
+      clusterColumns += "Entropy, Weighted Entropy";
+      outFile.println(clusterColumns);
       if(current.get(i).getEuclidean()){  
         for(int j = 0; j< current.get(i).clusters.size(); j++) {
           String nLine = j + ", " + current.get(i).clusters.get(j).getEntropy() + ", " 
@@ -257,9 +281,10 @@ public class KMeansClustering {
           outFile.println(nLine);
         }
       }
-      outFile.close();
     }
+    outFile.close();
   }
+  
   
   
   public static void main(String[] args) throws IOException {
@@ -272,7 +297,6 @@ public class KMeansClustering {
         classLabels.add(current);
       }
     }
-    System.out.println(classLabels.toString());
     
     KMeansClustering clusterEuc = new KMeansClustering(initData, classLabels.size(), classLabels, true);
     KMeansClustering doubleClusterEuc = new KMeansClustering(initData, classLabels.size() * 2, classLabels, true);

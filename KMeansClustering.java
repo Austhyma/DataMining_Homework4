@@ -48,6 +48,7 @@ public class KMeansClustering {
   }
   
   public void calculateBSS() {
+    //Figure out centroid for entire data set
     HashMap<String, Double> dataAttributes = new HashMap<String, Double>();
     for (int i = 0; i < clusters.size(); i++) {
       for (int j = 0; j < clusters.get(i).getCluster().size(); j++) {
@@ -62,6 +63,7 @@ public class KMeansClustering {
         }
       }
     }
+    //Calculate distances from dataset centroid
     for (int i = 0; i < clusters.size(); i++) {
       for (int j = 0; j < clusters.get(i).getCluster().size(); j++) {
         for (Iterator<String> stuff = clusters.get(i).getCentroid().getAttributes().keySet().iterator(); stuff.hasNext();) {
@@ -74,19 +76,16 @@ public class KMeansClustering {
       }
     }
   }
-  
-  //TODO
+
   public void calculateEntropy() {
     for (int i = 0; i < clusters.size(); i++) {
       Cluster current = clusters.get(i);
       current.calculateEntropy(classLabels);
       double numClassLabel = current.getCluster().size();
-//      System.out.println("NumClassLabel: " + numClassLabel);
-//      System.out.println("Weight: " + numClassLabel/this.data.size());
-//      System.out.println("Current Entropy: " + current.getEntropy());
-      this.weightedEntropy += (numClassLabel/this.data.size()) * current.getEntropy();
+      double value = (numClassLabel/this.data.size()) * current.getEntropy();
+      current.setWeightedEntropy(value);
+      this.weightedEntropy += value;
     }
-    
     this.infoGain = 1 - this.weightedEntropy;
   }           
   
@@ -177,22 +176,7 @@ public class KMeansClustering {
     int iterations = 0;
     boolean complete = false;
     while (!complete && iterations<100) {
-//      for (int i = 0; i < centroids.size(); i++) {
-//        String line = "Cluster: " + i + " =";
-//        int count = 0;
-//        for (Iterator<String> attribute = centroids.get(i).getAttributes().keySet().iterator(); attribute.hasNext();) {
-//          String current = attribute.next();
-//          if (count > 3) break;
-//          else line += " " + current + ": " + round(centroids.get(i).getAttributes().get(current), 5);
-//          count++;
-//        }
-//        System.out.println(line);
-//      }
       cluster();
-//      System.out.println("Iteration: " + iterations);
-//      for (int i = 0; i < this.clusters.size(); i++) {
-//        System.out.println("\tCluster " + i + ": " + this.clusters.get(i).getCluster().size());
-//      }
       centroids = computeCentroid();
       iterations++;
       complete = converge(centroids, oldCentroids);
@@ -272,22 +256,18 @@ public class KMeansClustering {
   
   //TODO
   public static void output(ArrayList<KMeansClustering> current, String filename) throws IOException {
-    //Display clusters?
-    
-    
     PrintWriter outFile = new PrintWriter(new FileWriter(filename +  "_results.csv"));
-    
     //Report cohesion and separation using WSS and BSS
     for(int i = 0; i < current.size(); i++) {
       String tableColumns = (current.get(i).getEuclidean()) ? "Euclidean," : "Manhattan,";
-      tableColumns += "WSS,BSS,InformationGain,WeightedEntropy";
+      tableColumns += "WSS,BSS,BSS/WSS,InformationGain,WeightedEntropy";
       outFile.println(tableColumns);
       if(current.get(i).getEuclidean()){     
-        String line = "k = " + current.get(i).getK() + ", " + current.get(i).getEucWSS() + ", " + current.get(i).getEucBSS() + ", " 
+        String line = "k = " + current.get(i).getK() + ", " + current.get(i).getEucWSS() + ", " + current.get(i).getEucBSS() + ", " + current.get(i).getEucBSS()/current.get(i).getEucWSS() + ", " 
           + current.get(i).getEntropy() + ", " + current.get(i).getWeightedEntropy() + ", ";
         outFile.println(line);
       }else {     
-        String line = "k = " + current.get(i).getK() + ", " + current.get(i).getManWSS() + ", " + current.get(i).getManBSS() + ", " 
+        String line = "k = " + current.get(i).getK() + ", " + current.get(i).getManWSS() + ", " + current.get(i).getManBSS() + ", " + current.get(i).getManBSS()/current.get(i).getManWSS() + ", " 
           + current.get(i).getEntropy() + ", " + current.get(i).getWeightedEntropy() + ", ";
         outFile.println(line);
       } 

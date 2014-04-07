@@ -22,6 +22,7 @@ public class Cluster {
   //Setters
   public void setCentroid(Data centroid) {this.centroid = centroid;}
   public void setCluster(ArrayList<Data> cluster) {this.cluster = cluster;}
+  public void setWeightedEntropy(double value) {this.weightedEntropy = value;}
   
   public double getEntropy() {return this.entropy;}
   
@@ -51,14 +52,6 @@ public class Cluster {
     }
     return counter;
   }
- 
-  //TODO
-  /*public void weightedEntropy(ArrayList<String> classLabels, ArrayList<Data> data) {
-    for (int i = 0; i < classLabels.size(); i++) {     
-      double probability = this.cluster.size()/data.size() * this.cluster.getEntropy();
-      this.weightedEntropy += -(probability * log(probability, classLabels.size()));
-    }
-  }*/
     
   public void addPoint(Data point) {
     this.cluster.add(point);
@@ -68,7 +61,6 @@ public class Cluster {
     return Math.log(value)/Math.log(base);
   }
   
-  //TODO
   public void calculateEntropy(ArrayList<String> classLabels) {
     for (int i = 0; i < classLabels.size(); i++) {
       double probability = classCount(classLabels.get(i))/(double) cluster.size();

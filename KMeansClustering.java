@@ -150,8 +150,13 @@ public class KMeansClustering {
     ArrayList<Data> centroids = new ArrayList<Data>();
     //select k points as initial centroids
     for (int i = 0; i < k; i++) {
-      int randomValue = (int) Math.round(Math.random()*(this.data.size() - 1));
-      Data centroid = this.data.get(randomValue);
+      boolean valid = false;
+      Data centroid = new Data();
+      while (!valid) {
+        int randomValue = (int) Math.round(Math.random()*(this.data.size() - 1));
+        centroid = this.data.get(randomValue);
+        valid = !centroids.contains(centroid);
+      }
       this.clusters.add(new Cluster(centroid));
       centroids.add(centroid);
     }
@@ -159,18 +164,19 @@ public class KMeansClustering {
     int iterations = 0;
     boolean complete = false;
     while (!complete && iterations<100) {
+      
       System.out.println("Iteration: " + iterations);
-      for (int i = 0; i < centroids.size(); i++) {
-        String line = "Cluster: " + i + " =";
-        int count = 0;
-        for (Iterator<String> attribute = centroids.get(i).getAttributes().keySet().iterator(); attribute.hasNext();) {
-          String current = attribute.next();
-          if (count > 3) break;
-          else line += " " + current + ": " + round(centroids.get(i).getAttributes().get(current), 5);
-          count++;
-        }
-        System.out.println(line);
-      }
+//      for (int i = 0; i < centroids.size(); i++) {
+//        String line = "Cluster: " + i + " =";
+//        int count = 0;
+//        for (Iterator<String> attribute = centroids.get(i).getAttributes().keySet().iterator(); attribute.hasNext();) {
+//          String current = attribute.next();
+//          if (count > 3) break;
+//          else line += " " + current + ": " + round(centroids.get(i).getAttributes().get(current), 5);
+//          count++;
+//        }
+//        System.out.println(line);
+//      }
       cluster();
 //      System.out.println("Iteration: " + iterations);
 //      for (int i = 0; i < this.clusters.size(); i++) {
@@ -178,8 +184,22 @@ public class KMeansClustering {
 //      }
       centroids = computeCentroid();
       iterations++;
-      complete = oldCentroids.equals(centroids);
+      complete = converge(centroids, oldCentroids);
+      oldCentroids = centroids;
     }
+  }
+  
+  public boolean converge(ArrayList<Data> centroids, ArrayList<Data> oldCentroids) {
+    boolean equal = true;
+    for (int i = 0; i < centroids.size(); i++) {
+      for (Iterator<String> attribute = centroids.get(i).getAttributes().keySet().iterator(); attribute.hasNext();) {
+        String current = attribute.next();
+        if (round(centroids.get(i).getAttribute(current), 5) != round(oldCentroids.get(i).getAttribute(current), 5)) {
+          equal = false; 
+        }
+      }//endForEach
+    }//EndFor
+    return equal;
   }
   
   public void cluster() {
@@ -207,7 +227,7 @@ public class KMeansClustering {
     double distance = 0;
     for (Iterator<String> attribute = current.getAttributes().keySet().iterator(); attribute.hasNext();) {
       String currentAttribute = attribute.next();
-      double manValue = Math.abs(current.getAttribute(currentAttribute) - centroid.getAttributes().get(currentAttribute));
+      double manValue = Math.abs(current.getAttribute(currentAttribute) - centroid.getAttribute(currentAttribute));
       distance += (euclidean) ? Math.pow(manValue, 2) : manValue;
     }
     return distance;

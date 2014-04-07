@@ -20,6 +20,8 @@ public class Data {
     this.iD = iD;
   }
   
+  public Data() {}
+  
   public Data(HashMap<String, Double> dimensions) {
     this.attributes = dimensions;
 

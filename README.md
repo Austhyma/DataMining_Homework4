@@ -9,10 +9,4 @@ and then:
 
 	java KMeansClustering <fileToBeClustered>
 	
-Should return a .csv file containing all the clusters and pertinent information pertaining to them. 
-(add more pretentious talks here)
-
-BUGS:
-1. Problem with iris file, generates too many class files
-TODO:
-***TEST EVERYTHING THOROUGHLY***
+Returns file: <filename>_results.csv into the same directory of your file. 

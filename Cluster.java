@@ -6,6 +6,7 @@ public class Cluster {
  private double eucWSSmeasure= 0;
  private double manWSSmeasure = 0;
  private double entropy = 0;
+ private double splitInfo = 0;
  
  public Cluster(Data centroid, ArrayList<Data> cluster) {
   this.centroid = centroid;
@@ -13,6 +14,7 @@ public class Cluster {
  }
  
  //Getters
+ public double getSplitInfo() {return this.splitInfo;}
  public double getEucWSS() {return this.eucWSSmeasure;}
  public Data getCentroid() {return this.centroid;}
  public ArrayList<Data> getCluster() {return this.cluster;}
@@ -39,18 +41,36 @@ public class Cluster {
    return counter;
  }
  
+ public double classCount2(String classLabel, ArrayList<Data> data) {
+   double counter = 0;
+   for (int i = 0; i < data.size(); i++) {
+     if (classLabel.equals(data.get(i).getClassLabel())) { counter++;}
+   }
+   return counter;
+ }
+
  public double log(double value, int base) {
    return Math.log(value)/Math.log(base);
  }
  
+ public void calculateEntropy(ArrayList<String> classLabels, ArrayList<Data> data) {
+   double entropySum = 0;  
+   for (int i = 0; i < classLabels.size(); i++) {
+     double probability = classCount(classLabels.get(i))/classCount2(classLabels.get(i), data);
+     entropySum += -(probability * log(probability, classLabels.size()));
+   }
+ }
      
+     
+     
+   
  
  //TODO
- public void calculateEntropy(ArrayList<String> classLabels) {
-   double entropySum = 0;
-   for (int i = 0; i < classLabels.size(); i++) {
-     double probability = classCount(classLabels.get(i))/(double) cluster.size();
-     entropySum += -(probability * log(probability, classLabels.size()));
+ public void calculateSplitInfo(ArrayList<String> classLabels, ArrayList<Data> data) {
+    
+   for (int i = 0; i < classLabels.size(); i++) {     
+     double probability = classCount2(classLabels.get(i), data)/(double) data.size();
+     splitInfo += -(probability * log(probability, classLabels.size()));
    }
  }
        

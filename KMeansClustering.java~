@@ -13,7 +13,7 @@ public class KMeansClustering {
  private ArrayList<String> classLabels;
  private double manWSS = 0;
  private double eucWSS = 0;
- private double entropy;
+ private double infoGain;
  private double manBSS = 0;
  private double eucBSS = 0;
    
@@ -23,15 +23,21 @@ public class KMeansClustering {
  public double getManWSS() {return this.manWSS;}
  public double getEucBSS() {return this.eucBSS;}
  public double getManBSS() {return this.manBSS;}
- public double getEntropy() {return this.entropy;}
- 
- //TODO
- //public void calculateWSS() {}
+ public double getEntropy() {return this.infoGain;}
  
  
+ public void calculateWSS() {
+   for (int i = 0; i < clusters.size(); i++) {
+     clusters.get(i).calculateWSS();
+     eucWSS += clusters.get(i).getEucWSS();
+     manWSS += clusters.get(i).getManWSS();
+   }  
+ }
  
  
- //TODO
+ 
+ 
+ 
  public void calculateBSS() {
   
    HashMap<String, Double> dataAttributes = new HashMap<String, Double>();
@@ -67,7 +73,15 @@ public class KMeansClustering {
  
  
  //TODO
- public void calculateEntropy() {}
+ public void calculateEntropy() {
+   for (int i = 0; i < clusters.size(); i++) {
+     clusters.get(i).calculateEntropy(classLabels);
+     infoGain += 1 - ((clusters.get(i).classCount(clusters.get(i).getCluster().get(i).getClassLabel())/clusters.get(i).getCluster().size()) * clusters.get(i).getEntropy());
+   }
+ }
+                      
+     
+ 
   
   public KMeansClustering(ArrayList<Data> data, int k, ArrayList<String> classLabels) {
     this.k = k;

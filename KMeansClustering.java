@@ -75,7 +75,7 @@ public class KMeansClustering {
  //TODO
  public void calculateEntropy() {
    for (int i = 0; i < clusters.size(); i++) {
-     clusters.get(i).calculateEntropy(classLabels);
+     clusters.get(i).calculateEntropy(classLabels, data);
      infoGain += 1 - ((clusters.get(i).classCount(clusters.get(i).getCluster().get(i).getClassLabel())/clusters.get(i).getCluster().size()) * clusters.get(i).getEntropy());
    }
  }
